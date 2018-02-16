@@ -8,22 +8,36 @@ typedef struct tree {
 
 tree* search_by_value(tree* Head, int val)
 {
+    tree* rezult;
     if (Head->value == val)
     {
         return Head;
     }
-    else
+    if (Head->value < val)
+    {
+        if (Head->right == NULL)
         {
-            if ((Head->value <= val) && (Head->right != NULL))
-            {
-                search_by_value(Head->right, val);
-            }
-            if ((Head->value > val) && (Head->left != NULL))
-            {
-                search_by_value(Head->left, val);
-            }
+            return NULL;
         }
-    return NULL;
+        if (Head->right != NULL)
+        {
+            rezult = search_by_value(Head->right, val);
+        }
+    }
+
+
+    if (Head->value > val)
+    {
+        if (Head->left == NULL)
+        {
+            return NULL;
+        }
+        if (Head->left != NULL)
+        {
+            rezult = search_by_value(Head->left, val);
+        }
+    }
+    return rezult;
 }
 tree* new_element_for_tree (int element)
 {
@@ -35,14 +49,14 @@ tree* new_element_for_tree (int element)
 }
 void insert_into_tree (tree* Head, tree* element)
 {
-    printf("in func %d\n", Head->value);
+    //printf("in func %d\n", Head->value);
     if (Head->value <= element->value)
     {
         if (Head->right == NULL)
         {
             Head->right = element;
             Head = Head->right;
-            printf("add element %d\n", Head->value);
+            //printf("add element %d\n", Head->value);
         }
         if (Head->right != NULL)
         {
@@ -57,7 +71,7 @@ void insert_into_tree (tree* Head, tree* element)
         {
             Head->left = element;
             Head = Head->left;
-            printf("add element %d\n", Head->value);
+            //printf("add element %d\n", Head->value);
         }
         if (Head->left != NULL)
         {
@@ -82,6 +96,113 @@ void print_tree (tree* Position)
     }
 }
 
+tree* search_head_for_delete(tree* Head, tree* el_del)
+{
+    tree* rezult;
+    if (Head->left == el_del)
+    {
+        return Head;
+    }
+
+    if (Head->right == el_del)
+    {
+        return Head;
+    }
+    if (Head->value <= el_del->value)
+    {
+        if (Head->right == NULL)
+        {
+            return NULL;
+        }
+        if (Head->right != NULL)
+        {
+            rezult = search_head_for_delete(Head->right, el_del);
+        }
+    }
+
+
+    if (Head->value > el_del->value)
+    {
+        if (Head->left == NULL)
+        {
+            return NULL;
+        }
+        if (Head->left != NULL)
+        {
+            rezult = search_head_for_delete(Head->left, el_del);
+        }
+    }
+    return rezult;
+}
+
+void delete_element_tree(tree* Head, tree* el_del)
+{
+    /*if (Head == el_del)
+    {
+        tree* t = new_element_for_tree(2);
+        t->value = Head->value;
+        t->
+        insert_into_tree(t, Head->right);
+        printf("Now %d is head element\n", t->value);
+        free(Head);
+    }
+    else
+    {*/
+        tree* s;
+        s = search_head_for_delete(Head, el_del);
+        if ((el_del->left == NULL) && (el_del->right == NULL))
+        {
+            if (s->value <= el_del->value)
+            {
+                s->right = NULL;
+            }
+            else
+            {
+                s->left = NULL;
+            }
+            free(el_del);
+        }
+        if ((el_del->right == NULL) && (el_del->left != NULL))
+        {
+            if (s->value <= el_del->value)
+            {
+                s->right = el_del->left;
+            }
+            if (s->value > el_del->value)
+            {
+                s->left = el_del->left;
+            }
+            free(el_del);
+        }
+        if ((el_del->right != NULL) && (el_del->left == NULL))
+        {
+            if (s->value <= el_del->value)
+            {
+                s->right = el_del->right;
+            }
+            if (s->value > el_del->value)
+            {
+                s->left = el_del->right;
+            }
+            free(el_del);
+        }
+        if ((el_del->right != NULL) && (el_del->left != NULL))
+        {
+            if (s->value <= el_del->value)
+            {
+                s->right = el_del->left;
+                insert_into_tree(s->right, el_del->right);
+            }
+            if (s->value > el_del->value)
+            {
+                s->left = el_del->left;
+                insert_into_tree(s->left, el_del->right);
+            }
+            free(el_del);
+        }
+    //}
+}
+
 int main()
 {
     printf("Hello world!!!!!!!!!!!!!!!\n");
@@ -100,27 +221,40 @@ int main()
     tree* Ivan55 = new_element_for_tree(5);
 
     insert_into_tree(Ivan5, Ivan1);
-    printf("1\n");
     insert_into_tree(Ivan5, Ivan3);
-    printf("1\n");
     insert_into_tree(Ivan5, Ivan_5);
-    printf("1\n");
     insert_into_tree(Ivan5, Ivan8);
-    printf("1\n");
     insert_into_tree(Ivan5, Ivan12);
-    printf("1\n");
     insert_into_tree(Ivan5, Ivan4);
-    printf("1\n");
     insert_into_tree(Ivan5, Ivan10);
     insert_into_tree(Ivan5, Ivan44);
     insert_into_tree(Ivan5, Ivan9);
     insert_into_tree(Ivan5, Ivan11);
     insert_into_tree(Ivan5, Ivan55);
-
-
-
-    printf("%d\n", Ivan5->left->right->right->value);
-    printf("2 Yes\n");
+    printf("tree:\n");
     print_tree(Ivan5);
+
+    tree* for_find = NULL;
+    for_find = search_by_value(Ivan5, 12);
+    if (for_find == NULL)
+    {
+        printf("Not found\n");
+    }
+    else{ printf("found: %d\n", for_find->value);}
+    tree* s = NULL;
+    s = search_head_for_delete(Ivan5, Ivan8);
+    if (s == NULL)
+    {
+        printf("Not found *\n");
+    }
+    else{ printf("found*: %d\n", s->value);}
+    delete_element_tree(Ivan5, Ivan8);
+    printf("after delete\n");
+    //printf("1 :%d\n", Ivan5->right->right->left->right->value);
+    print_tree(Ivan5);
+
+
+
+
     return 0;
 }
