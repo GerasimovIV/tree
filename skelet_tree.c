@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 typedef struct tree {
     int value;
     int hight;
@@ -104,7 +105,7 @@ void print_tree (tree* Position)
 
 tree* search_head_for_delete(tree* Head, tree* el_del)
 {
-    tree* rezult;
+    tree* rezult = NULL;
     if (Head->left == el_del)
     {
         return Head;
@@ -253,19 +254,7 @@ void change_hight(tree* Position)
     }
 }
 void small_left_rotation(tree* node_a)
-{/*
-	tree* Head_a = search_head_for_delete(node_a);
-	if ((Head_a != NULL) && (Head_a <= node_a))
-	{
-		Head_a->right = NULL;
-	}
-	if ((Head_a != NULL) && (Head_a > node_a))
-	{
-		Head_a->left = NULL;
-	}*/
-	
-	
-	// отсоединяем A
+{
 	tree* node_b = node_a->right;
 	node_a->right = node_b->left;
 	node_b->left = node_a;
@@ -298,11 +287,158 @@ int get_hight_for_me(tree* node)
 {
 	if (node == NULL)
 	{
-		return 0;
+		return -1;
 	}
 	return node->hight;
 }
-void balance_tree
+
+void balance(tree* node, tree** Head)//передаем head, head второй понадобтся позже
+{
+	printf("Head:%d 1: %d\n",(*Head)->value, node->value);
+	if (node->left != NULL)
+	{
+		printf("Head:%d 2: %d\n",(*Head)->value, node->value);
+		balance(node->left, Head);
+	}
+	if (abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) ==2 )
+	{
+		int t = 0;
+		//printnf("%d %d", )
+		if ((get_hight_for_me(node->right->left) < get_hight_for_me(node->right->right)) && (abs(get_hight_for_me(node->right)-get_hight_for_me(node->left)) == 2) && (t != 1))
+		{
+			//малое левое вращение
+			tree* prev = search_head_for_delete(*Head, node);
+			if (prev != NULL)
+			{
+				//узнаем расположение prev и node
+				if (prev->value <= node->value)
+				{
+					prev->right = node->right;
+				}
+				else
+				{
+					prev->left = node->right;
+				}
+				small_left_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}
+			else
+			{
+				*Head = node->right;
+				small_left_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}		
+		}
+		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) == 2) && (get_hight_for_me(node->right->left) > get_hight_for_me(node->right->right)) && (t != 1))
+		{
+			//большое левое вращение
+			tree* prev = search_head_for_delete(*Head, node);
+			if (prev != NULL)
+			{
+				//узнаем расположение prev и node
+				if (prev->value <= node->value)
+				{
+					prev->right = node->right->left;
+				}
+				else
+				{
+					prev->left = node->right->left;
+				}
+				big_left_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}
+			else
+			{
+				*Head = node->right->left;
+				big_left_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}		
+			
+		}
+		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) == 2) && (get_hight_for_me(node->left->right) < get_hight_for_me(node->left->left)) && (t != 1))
+		{
+			//малое правое вращение
+			tree* prev = search_head_for_delete(*Head, node);
+			if (prev != NULL)
+			{
+				//узнаем расположение prev и node
+				if (prev->value <= node->value)
+				{
+					prev->right = node->left;
+				}
+				else
+				{
+					prev->left = node->left;
+				}
+				small_right_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}
+			else
+			{
+				*Head = node->left;
+				small_right_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}		
+		}
+		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) == 2) && (get_hight_for_me(node->left->right) > get_hight_for_me(node->left->left)) && (t != 1))
+		{
+			//большое правое вращение
+			tree* prev = search_head_for_delete(*Head, node);
+			if (prev != NULL)
+			{
+				//узнаем расположение prev и node
+				if (prev->value <= node->value)
+				{
+					prev->right = node->left->right;
+				}
+				else
+				{
+					prev->left = node->left->right;
+				}
+				big_right_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}
+			else
+			{
+				*Head = node->left->right;
+				big_right_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}		
+		}
+	}
+	
+	if (node->right != NULL)
+	{
+		printf("Head:%d 2*: %d\n",(*Head)->value, node->value);
+		balance(node->right, Head);
+		printf("Head:%d 2**: %d\n",(*Head)->value, node->value);
+	}
+	
+}
+tree* balance_tree(tree* Head)
+{
+	tree* itog;
+	tree* Head1 = Head;
+	balance(Head, &Head1);
+	change_hight(Head1);
+	while (Head != Head1)
+	{
+		Head = Head1;
+		balance(Head, &Head1);
+		change_hight(Head1);
+	}
+	
+	
+	return Head1;
+}
 int main()
 {
     printf("Hello world!!!!!!!!!!!!!!!\n");
@@ -324,6 +460,7 @@ int main()
     tree* Ivan15 = new_element_for_tree(15);
 	tree* Ivan66 = new_element_for_tree(6);
 	tree* Ivan7 = new_element_for_tree(7);
+	tree* Ivan16 = new_element_for_tree(16);
 	
 
     insert_into_tree(Ivan5, Ivan1);
@@ -332,20 +469,20 @@ int main()
     insert_into_tree(Ivan5, Ivan8);
     insert_into_tree(Ivan5, Ivan12);
     insert_into_tree(Ivan5, Ivan4);
-    //insert_into_tree(Ivan5, Ivan10);
+    insert_into_tree(Ivan5, Ivan10);
     //insert_into_tree(Ivan5, Ivan44);
-    //insert_into_tree(Ivan5, Ivan9);
-    //insert_into_tree(Ivan5, Ivan11);
+    insert_into_tree(Ivan5, Ivan9);
+    insert_into_tree(Ivan5, Ivan11);
     //insert_into_tree(Ivan5, Ivan55);
     insert_into_tree(Ivan5, Ivan13);
     insert_into_tree(Ivan5, Ivan14);
     insert_into_tree(Ivan5, Ivan15);
 	//insert_into_tree(Ivan10, Ivan66);
 	insert_into_tree(Ivan5, Ivan7);
-	insert_into_tree(Ivan10, Ivan11);
-	insert_into_tree(Ivan10, Ivan9);
-	insert_into_tree(Ivan10, Ivan66);
-	insert_into_tree(Ivan5, Ivan10);
+	//insert_into_tree(Ivan10, Ivan11);
+	//insert_into_tree(Ivan10, Ivan9);
+	//insert_into_tree(Ivan10, Ivan66);
+	//insert_into_tree(Ivan5, Ivan10);
 	
     /*printf("tree:\n");
     print_tree(Ivan5);
@@ -368,16 +505,27 @@ int main()
     printf("after delete\n");*/
     //printf("1 :%d\n", Ivan5->right->right->left->left->left->value);
     //print_tree(Ivan5);
-    change_hight(Ivan5);
-    print_tree_with_hight(Ivan5);
+    //change_hight(Ivan5);
+    //print_tree_with_hight(Ivan5);
 	//small_left_rotation(Ivan8);
 	//Ivan5->right = Ivan12;
 	//printf("after\n");
 	//Ivan5->right = Ivan12;
 	//printf("hight: %d\n", get_hight_for_me(Ivan_5->left));
 	//print_tree_with_hight(Ivan5);
-	
-
+	/*insert_into_tree(Ivan13, Ivan10);
+	insert_into_tree(Ivan13, Ivan9);
+	insert_into_tree(Ivan13, Ivan11);
+	insert_into_tree(Ivan13, Ivan14);
+	insert_into_tree(Ivan13, Ivan15);
+	insert_into_tree(Ivan13, Ivan16);*/
+	change_hight(Ivan5);
+	print_tree_with_hight(Ivan5);
+	tree* r = balance_tree(Ivan5);
+	printf("after\n");
+	change_hight(r);
+	print_tree_with_hight(r);
+	//printf("%d\n", r->left->left->left->right->right->value);
 
 
 
