@@ -2,6 +2,7 @@
 #include <stdlib.h>
 typedef struct tree {
     int value;
+    int hight;
     struct tree* left;
     struct tree* right;
 } tree;
@@ -202,6 +203,50 @@ void delete_element_tree(tree* Head, tree* el_del)
         }
     //}
 }
+int get_hight(tree* node)
+{
+    if (node == NULL)
+    {
+        return 0;
+    }
+    if ((node->left == NULL) && (node->right == NULL))
+        return 0;
+    else
+    {
+        if (get_hight(node->right) <= get_hight(node->left))
+        {
+            return  get_hight(node->left) + 1;
+        }
+        if (get_hight(node->right) > get_hight(node->left))
+        {
+            return get_hight(node->right) + 1;
+        }
+    }
+}
+void print_tree_with_hight (tree* Position)
+{
+    if (Position->left != NULL)
+    {
+        print_tree_with_hight(Position->left);
+    }
+    printf("node: %d hight: %d \n", Position->value, Position->hight);
+    if (Position->right != NULL)
+    {
+        print_tree_with_hight(Position->right);
+    }
+}
+void change_hight(tree* Position)
+{
+    if (Position->left != NULL)
+    {
+        change_hight(Position->left);
+    }
+    Position->hight = get_hight(Position);
+    if (Position->right != NULL)
+    {
+        change_hight(Position->right);
+    }
+}
 
 int main()
 {
@@ -219,6 +264,9 @@ int main()
     tree* Ivan9 = new_element_for_tree(9);
     tree* Ivan11 = new_element_for_tree(11);
     tree* Ivan55 = new_element_for_tree(5);
+    tree* Ivan13 = new_element_for_tree(13);
+    tree* Ivan14 = new_element_for_tree(14);
+    tree* Ivan15 = new_element_for_tree(15);
 
     insert_into_tree(Ivan5, Ivan1);
     insert_into_tree(Ivan5, Ivan3);
@@ -227,10 +275,13 @@ int main()
     insert_into_tree(Ivan5, Ivan12);
     insert_into_tree(Ivan5, Ivan4);
     insert_into_tree(Ivan5, Ivan10);
-    insert_into_tree(Ivan5, Ivan44);
+    //insert_into_tree(Ivan5, Ivan44);
     insert_into_tree(Ivan5, Ivan9);
     insert_into_tree(Ivan5, Ivan11);
-    insert_into_tree(Ivan5, Ivan55);
+    //insert_into_tree(Ivan5, Ivan55);
+    insert_into_tree(Ivan5, Ivan13);
+    insert_into_tree(Ivan5, Ivan14);
+    insert_into_tree(Ivan5, Ivan15);
     printf("tree:\n");
     print_tree(Ivan5);
 
@@ -251,10 +302,13 @@ int main()
     delete_element_tree(Ivan5, Ivan8);
     printf("after delete\n");
     //printf("1 :%d\n", Ivan5->right->right->left->right->value);
-    print_tree(Ivan5);
+    //print_tree(Ivan5);
+    change_hight(Ivan5);
+    print_tree_with_hight(Ivan5);
 
 
 
 
     return 0;
 }
+
