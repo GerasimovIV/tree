@@ -43,7 +43,7 @@ tree* search_by_value(tree* Head, int val)
 }
 tree* new_element_for_tree (int element)
 {
-    tree* Head = malloc(sizeof(tree));
+    tree* Head = (tree*)malloc(sizeof(tree));
     Head->value = element;
     Head->right = NULL;
     Head->left = NULL;
