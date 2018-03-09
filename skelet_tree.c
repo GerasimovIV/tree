@@ -294,17 +294,18 @@ int get_hight_for_me(tree* node)
 
 void balance(tree* node, tree** Head)//передаем head, head второй понадобтся позже
 {
-	printf("Head:%d 1: %d\n",(*Head)->value, node->value);
+	//printf("Head:%d 1: %d\n",(*Head)->value, node->value);
 	if (node->left != NULL)
 	{
-		printf("Head:%d 2: %d\n",(*Head)->value, node->value);
+		//printf("Head:%d 2: %d\n",(*Head)->value, node->value);
 		balance(node->left, Head);
 	}
-	if (abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) ==2 )
+	change_hight(*Head);
+	if (abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) >=2 )
 	{
 		int t = 0;
 		//printnf("%d %d", )
-		if ((get_hight_for_me(node->right->left) < get_hight_for_me(node->right->right)) && (abs(get_hight_for_me(node->right)-get_hight_for_me(node->left)) == 2) && (t != 1))
+		if ((get_hight_for_me(node->right->left) < get_hight_for_me(node->right->right)) && (abs(get_hight_for_me(node->right)-get_hight_for_me(node->left)) >= 2) && (t != 1))
 		{
 			//малое левое вращение
 			tree* prev = search_head_for_delete(*Head, node);
@@ -331,7 +332,7 @@ void balance(tree* node, tree** Head)//передаем head, head второй 
 				t = 1;
 			}		
 		}
-		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) == 2) && (get_hight_for_me(node->right->left) > get_hight_for_me(node->right->right)) && (t != 1))
+		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) >= 2) && (get_hight_for_me(node->right->left) > get_hight_for_me(node->right->right)) && (t != 1))
 		{
 			//большое левое вращение
 			tree* prev = search_head_for_delete(*Head, node);
@@ -359,7 +360,7 @@ void balance(tree* node, tree** Head)//передаем head, head второй 
 			}		
 			
 		}
-		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) == 2) && (get_hight_for_me(node->left->right) < get_hight_for_me(node->left->left)) && (t != 1))
+		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) >= 2) && (get_hight_for_me(node->left->right) < get_hight_for_me(node->left->left)) && (t != 1))
 		{
 			//малое правое вращение
 			tree* prev = search_head_for_delete(*Head, node);
@@ -386,7 +387,7 @@ void balance(tree* node, tree** Head)//передаем head, head второй 
 				t = 1;
 			}		
 		}
-		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) == 2) && (get_hight_for_me(node->left->right) > get_hight_for_me(node->left->left)) && (t != 1))
+		if ((abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) >= 2) && (get_hight_for_me(node->left->right) > get_hight_for_me(node->left->left)) && (t != 1))
 		{
 			//большое правое вращение
 			tree* prev = search_head_for_delete(*Head, node);
@@ -413,13 +414,14 @@ void balance(tree* node, tree** Head)//передаем head, head второй 
 				t = 1;
 			}		
 		}
+		change_hight(*Head);
 	}
 	
 	if (node->right != NULL)
 	{
-		printf("Head:%d 2*: %d\n",(*Head)->value, node->value);
+		//printf("Head:%d 2*: %d\n",(*Head)->value, node->value);
 		balance(node->right, Head);
-		printf("Head:%d 2**: %d\n",(*Head)->value, node->value);
+		//printf("Head:%d 2**: %d\n",(*Head)->value, node->value);
 	}
 	
 }
@@ -442,7 +444,19 @@ tree* balance_tree(tree* Head)
 int main()
 {
     printf("Hello world!!!!!!!!!!!!!!!\n");
-
+	/*tree* Ivan1 = new_element_for_tree(1);
+	tree* Ivan2 = new_element_for_tree(2);
+	tree* Ivan3 = new_element_for_tree(3);
+	tree* Ivan4 = new_element_for_tree(4);
+	tree* Ivan5 = new_element_for_tree(5);
+	tree* Ivan6 = new_element_for_tree(6);
+	
+	insert_into_tree(Ivan1, Ivan2);
+	insert_into_tree(Ivan1, Ivan3);	
+	insert_into_tree(Ivan1, Ivan4);
+	insert_into_tree(Ivan1, Ivan5);	
+	insert_into_tree(Ivan1, Ivan6);*/
+	
     tree* Ivan5 = new_element_for_tree(5);
     tree* Ivan1 = new_element_for_tree(1);
     tree* Ivan3 = new_element_for_tree(3);
@@ -522,10 +536,11 @@ int main()
 	change_hight(Ivan5);
 	print_tree_with_hight(Ivan5);
 	tree* r = balance_tree(Ivan5);
+	//tree* w = balance_tree(r);
 	printf("after\n");
 	change_hight(r);
 	print_tree_with_hight(r);
-	//printf("%d\n", r->left->left->left->right->right->value);
+	//printf("%d\n", r->right->right->left->value);
 
 
 
