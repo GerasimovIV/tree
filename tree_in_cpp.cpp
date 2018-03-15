@@ -47,7 +47,7 @@ protected:
     tree* root;
     void insert_into_tree(tree* Head, tree* element);
     tree* search_by_value(tree* Head, int val);
-    void delete_element_tree(tree* Head, tree* el_del);
+    void delete_element_tree(tree** Head, tree* el_del);
     void delete_struckt(tree* Head);
     tree* search_head_for_delete(tree* Head, tree* el_del);
     void print_tree(tree* Head);
@@ -203,10 +203,12 @@ void SimpleTree::remove(int value)
     tree* el_del = this->find(value);
     if (el_del != NULL)
     {
-        delete_element_tree(this->root, el_del);
+        delete_element_tree(&this->root, el_del);
     }
-	Balance_tree_polzovatel();
-
+	if (this->root != NULL)
+	{
+		Balance_tree_polzovatel();
+	}
 }
 
 
@@ -249,22 +251,28 @@ tree* SimpleTree::search_head_for_delete(tree* Head, tree* el_del)
     return rezult;
 }
 
-void SimpleTree::delete_element_tree(tree* Head, tree* el_del)
+void SimpleTree::delete_element_tree(tree** Head, tree* el_del)
 {
 
-    /*if (Head == el_del)
+    if ((*Head) == el_del)
     {
-        tree* t = new_element_for_tree(2);
-        t->value = Head->value;
-        t->
-        insert_into_tree(t, Head->right);
-        printf("Now %d is head element\n", t->value);
-        free(Head);
+        if ((*Head)->left != NULL)
+		{
+			this->root = (*Head)->left;
+		}
+		if ((*Head)->right != NULL)
+		{
+			this->root = (*Head)->right;
+		}
+		if (((*Head)->left == NULL) && ((*Head)->right == NULL))
+		{
+			this->root = NULL;
+		}
     }
     else
-    {*/
+    {
         tree* s;
-        s = search_head_for_delete(Head, el_del);
+        s = search_head_for_delete((*Head), el_del);
         if ((el_del->left == NULL) && (el_del->right == NULL))
         {
             if (s->value <= el_del->value)
@@ -315,7 +323,7 @@ void SimpleTree::delete_element_tree(tree* Head, tree* el_del)
             }
             free(el_del);
         }
-    //}
+    }
 }
 
 int SimpleTree::get_hight(tree* node)
