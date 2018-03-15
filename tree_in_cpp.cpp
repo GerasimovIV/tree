@@ -51,6 +51,17 @@ protected:
     void delete_struckt(tree* Head);
     tree* search_head_for_delete(tree* Head, tree* el_del);
     void print_tree(tree* Head);
+	tree* balance_tree(tree* node);
+	void balance(tree* node, tree** Head);
+	void small_left_rotation(tree* node_a);
+	void big_left_rotation(tree* node_a);
+	void big_right_rotation(tree* node_a);
+	void small_right_rotation(tree* node_a);
+	int get_hight_for_me(tree* node);
+	int get_hight(tree* node);
+	void change_hight(tree* Position);
+	void print_tree_with_hight (tree* Position);
+	void Balance_tree_polzovatel();
 };
 
 SimpleTree::SimpleTree()
@@ -64,11 +75,12 @@ void SimpleTree::delete_struckt(tree* Position)
     {
         delete_struckt(Position->left);
     }
-    free(Position);
+
     if (Position->right != NULL)
     {
         delete_struckt(Position->right);
     }
+	free(Position);
 }
 SimpleTree::~SimpleTree()
 {
@@ -136,6 +148,7 @@ void SimpleTree::insert(int value)
     {
         insert_into_tree(this->root, element);
     }
+	Balance_tree_polzovatel();
 }
 
 tree* SimpleTree::search_by_value(tree* Head, int val)
@@ -192,6 +205,7 @@ void SimpleTree::remove(int value)
     {
         delete_element_tree(this->root, el_del);
     }
+	Balance_tree_polzovatel();
 
 }
 
@@ -304,21 +318,273 @@ void SimpleTree::delete_element_tree(tree* Head, tree* el_del)
     //}
 }
 
-void SimpleTree::print()
+int SimpleTree::get_hight(tree* node)
 {
-    print_tree(this->root);
+    if (node == NULL)
+    {
+        return 0;
+    }
+    if ((node->left == NULL) && (node->right == NULL))
+        return 0;
+    else
+    {
+        if (get_hight(node->right) <= get_hight(node->left))
+        {
+            return  get_hight(node->left) + 1;
+        }
+        if (get_hight(node->right) > get_hight(node->left))
+        {
+            return get_hight(node->right) + 1;
+        }
+    }
 }
-void SimpleTree::print_tree(tree* Position)
+void SimpleTree::change_hight(tree* Position)
 {
     if (Position->left != NULL)
     {
-        print_tree(Position->left);
+        change_hight(Position->left);
     }
-    printf("%d\n", Position->value);
+    Position->hight = get_hight(Position);
     if (Position->right != NULL)
     {
-        print_tree(Position->right);
+        change_hight(Position->right);
     }
+}
+void SimpleTree::small_left_rotation(tree* node_a)
+{
+	tree* node_b = node_a->right;
+	node_a->right = node_b->left;
+	node_b->left = node_a;
+}
+void SimpleTree::big_left_rotation(tree* node_a)
+{
+	tree* node_b = node_a->right;
+	tree* node_c = node_b->left;
+	node_a->right = node_c->left;
+	node_b->left = node_c->right;
+	node_c->left = node_a;
+	node_c->right = node_b;
+}
+void SimpleTree::big_right_rotation(tree* node_a)
+{
+	tree* node_b = node_a->left;
+	tree* node_c = node_b->right;
+	node_a->left = node_c->right;
+	node_b->right = node_c->left;
+	node_c->left = node_b;
+	node_c->right = node_a;
+}
+void SimpleTree::small_right_rotation(tree* node_a)
+{
+	tree* node_b = node_a->left;
+	node_a->left = node_b->right;
+	node_b->right = node_a;
+}
+int SimpleTree::get_hight_for_me(tree* node)
+{
+	if (node == NULL)
+	{
+		return -1;
+	}
+	return node->hight;
+}
+
+void SimpleTree::balance(tree* node, tree** Head)//передаем head, head второй понадобтся позже
+{
+	//printf("Head:%d 1: %d\n",(*Head)->value, node->value);
+	if (node->left != NULL)
+	{
+		//printf("Head:%d 2: %d\n",(*Head)->value, node->value);
+		balance(node->left, Head);
+	}
+	if (node->right != NULL)
+	{
+		//printf("Head:%d 2*: %d\n",(*Head)->value, node->value);
+		balance(node->right, Head);
+		//printf("Head:%d 2**: %d\n",(*Head)->value, node->value);
+	}
+	change_hight(*Head);
+
+	/*printf("Head->value:%d; node->value: %d\n",(*Head)->value, node->value);
+	printf("%d\n", abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)));
+	print_tree_with_hight(*Head);*/
+	
+	
+	if (abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) >=2 )
+	{
+		int t = 0;
+		//printnf("%d %d", )
+		
+		if ( (t != 1) && (abs(get_hight_for_me(node->right)-get_hight_for_me(node->left)) >= 2) && (get_hight_for_me(node->right->left) <= get_hight_for_me(node->right->right)))
+		{
+			//малое левое вращение
+			
+			tree* prev = search_head_for_delete(*Head, node);
+			
+			//printf("%d", prev->value);
+			if (prev != NULL)
+			{
+				//узнаем расположение prev и node
+				if (prev->value <= node->value)
+				{
+					prev->right = node->right;
+				}
+				else
+				{
+					prev->left = node->right;
+				}
+				small_left_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}
+			else
+			{
+				
+				*Head = node->right;
+				small_left_rotation(node);
+				change_hight(*Head);
+				t = 1;
+				
+			}		
+		}
+		if ((t != 1) && (abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) >= 2) && (get_hight_for_me(node->right->left) > get_hight_for_me(node->right->right)))
+		{
+			//большое левое вращение
+			tree* prev = search_head_for_delete(*Head, node);
+			if (prev != NULL)
+			{
+				//узнаем расположение prev и node
+				if (prev->value <= node->value)
+				{
+					prev->right = node->right->left;
+				}
+				else
+				{
+					prev->left = node->right->left;
+				}
+				big_left_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}
+			else
+			{
+				*Head = node->right->left;
+				big_left_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}		
+			
+		}
+		if ((t != 1) && (abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) >= 2) && (get_hight_for_me(node->left->right) <= get_hight_for_me(node->left->left)))
+		{
+			//малое правое вращение
+			tree* prev = search_head_for_delete(*Head, node);
+			if (prev != NULL)
+			{
+				//узнаем расположение prev и node
+				if (prev->value <= node->value)
+				{
+					prev->right = node->left;
+				}
+				else
+				{
+					prev->left = node->left;
+				}
+				small_right_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}
+			else
+			{
+				*Head = node->left;
+				small_right_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}		
+		}
+		if ((t != 1) && (abs(get_hight_for_me(node->left) - get_hight_for_me(node->right)) >= 2) && (get_hight_for_me(node->left->right) > get_hight_for_me(node->left->left)))
+		{
+			//большое правое вращение
+			tree* prev = search_head_for_delete(*Head, node);
+			if (prev != NULL)
+			{
+				//узнаем расположение prev и node
+				if (prev->value <= node->value)
+				{
+					prev->right = node->left->right;
+				}
+				else
+				{
+					prev->left = node->left->right;
+				}
+				big_right_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}
+			else
+			{
+				*Head = node->left->right;
+				big_right_rotation(node);
+				change_hight(*Head);
+				t = 1;
+			}		
+		}
+		change_hight(*Head);
+	}
+	
+
+	
+}
+tree* SimpleTree::balance_tree(tree* Head)
+{
+	tree* itog;
+	tree* Head1 = Head;
+	balance(Head, &Head1);
+	change_hight(Head1);
+	while (Head != Head1)
+	{
+		Head = Head1;
+		balance(Head, &Head1);
+		change_hight(Head1);
+	}
+	
+	
+	return Head1;
+}
+void SimpleTree::Balance_tree_polzovatel()
+{
+	if (this->root == NULL)
+	{
+		printf("Error: Can not make balance for empty tree!\n");
+	}
+	else
+	{
+		this->root = balance_tree(this->root);
+	}
+}
+void SimpleTree::print_tree_with_hight (tree* Position)
+{
+    if (Position->left != NULL)
+    {
+        print_tree_with_hight(Position->left);
+    }
+    printf("node: %d hight: %d \n", Position->value, Position->hight);
+    if (Position->right != NULL)
+    {
+        print_tree_with_hight(Position->right);
+    }
+}
+void SimpleTree::print()
+{
+	if (this->root != NULL)
+	{
+		change_hight(this->root);
+		print_tree_with_hight(this->root);
+	}
+	else
+	{
+		printf("Error: empty tree!");
+	}
 }
 // TODO
 
