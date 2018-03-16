@@ -204,11 +204,12 @@ void SimpleTree::remove(int value)
     if (el_del != NULL)
     {
         delete_element_tree(&this->root, el_del);
+		if (this->root != NULL)
+		{
+			Balance_tree_polzovatel();
+		}
     }
-	if (this->root != NULL)
-	{
-		Balance_tree_polzovatel();
-	}
+
 }
 
 
@@ -273,7 +274,8 @@ void SimpleTree::delete_element_tree(tree** Head, tree* el_del)
     {
         tree* s;
         s = search_head_for_delete((*Head), el_del);
-        if ((el_del->left == NULL) && (el_del->right == NULL))
+		int t = 0;
+        if ((t != 1) && (el_del->left == NULL) && (el_del->right == NULL))
         {
             if (s->value <= el_del->value)
             {
@@ -284,8 +286,9 @@ void SimpleTree::delete_element_tree(tree** Head, tree* el_del)
                 s->left = NULL;
             }
             free(el_del);
+			t = 1;
         }
-        if ((el_del->right == NULL) && (el_del->left != NULL))
+        if ((t != 1) && (el_del->right == NULL) && (el_del->left != NULL))
         {
             if (s->value <= el_del->value)
             {
@@ -296,8 +299,9 @@ void SimpleTree::delete_element_tree(tree** Head, tree* el_del)
                 s->left = el_del->left;
             }
             free(el_del);
+			t = 1;
         }
-        if ((el_del->right != NULL) && (el_del->left == NULL))
+        if ((t != 1) && (el_del->right != NULL) && (el_del->left == NULL))
         {
             if (s->value <= el_del->value)
             {
@@ -308,8 +312,9 @@ void SimpleTree::delete_element_tree(tree** Head, tree* el_del)
                 s->left = el_del->right;
             }
             free(el_del);
+			t = 1;
         }
-        if ((el_del->right != NULL) && (el_del->left != NULL))
+        if ((t != 1) && (el_del->right != NULL) && (el_del->left != NULL))
         {
             if (s->value <= el_del->value)
             {
@@ -322,6 +327,7 @@ void SimpleTree::delete_element_tree(tree** Head, tree* el_del)
                 insert_into_tree(s->left, el_del->right);
             }
             free(el_del);
+			t = 1;
         }
     }
 }
